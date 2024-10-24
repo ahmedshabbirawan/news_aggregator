@@ -1,0 +1,8 @@
+{
+    "User": true,
+    "Auth": true,
+    "Article": true,
+    "NewsData": true,
+    "Category": true,
+    "Media": true
+}

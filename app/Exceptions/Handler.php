@@ -2,8 +2,10 @@
 
 namespace App\Exceptions;
 
+use App\Http\Responses\AppResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use ReflectionException;
 
 class Handler extends ExceptionHandler
 {
@@ -26,5 +28,15 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Throwable $exception)
+    {
+        return parent::render($request, $exception);
+        if ($exception instanceof ReflectionException) {
+            $error = $exception->getMessage();
+            return AppResponse::error($error);
+        }
+        return parent::render($request, $exception);
     }
 }

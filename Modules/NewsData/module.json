@@ -1,0 +1,11 @@
+{
+    "name": "NewsData",
+    "alias": "newsdata",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\NewsData\\App\\Providers\\NewsDataServiceProvider"
+    ],
+    "files": []
+}
