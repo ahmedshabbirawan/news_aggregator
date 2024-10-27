@@ -6,8 +6,6 @@ use App\Features\BaseFeature;
 use App\Http\Responses\AppResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Modules\User\App\Repositories\UserRepository;
 
 class LoginUserFeature extends BaseFeature
 {
