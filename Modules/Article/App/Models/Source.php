@@ -10,6 +10,7 @@ class Source extends Model
 
     public $timestamps = false;
     protected $guarded = [];
+    protected $fillable = [ 'name','slug' ];
 
     public function news(){
         return $this->hasMany(News::class);

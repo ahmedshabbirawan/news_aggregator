@@ -13,14 +13,16 @@ return new class extends Migration
     {
         Schema::create('news', function (Blueprint $table) {
             $table->id();
-            $table->tinyText('raw_author')->nullable();
+
             $table->text('title')->fulltext();
             $table->text('slug');
             $table->text('url');
             $table->text('image_url')->nullable();
             $table->text('description')->nullable()->fulltext();
             $table->text('content')->nullable()->fulltext();
-            $table->string('api_source')->nullable();
+            $table->integer('source_id')->nullable();
+            $table->tinyText('source_name')->nullable();
+            $table->tinyText('authors_object')->nullable();
             $table->timestamp('published_at');
             $table->timestamps();
         });

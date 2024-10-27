@@ -10,8 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Modules\Article\App\Models\Author;
+use Modules\Article\App\Repositories\AuthorRepository;
 use Modules\Article\App\Repositories\NewsRepository;
 use Modules\User\App\Repositories\UserRepository;
+
 
 class NewYorkFetchFeature extends BaseFeature
 {
@@ -52,6 +55,25 @@ class NewYorkFetchFeature extends BaseFeature
                     }
                 }
 
+                /*******************    Source     ****************************/
+                $source_slug = Arr::get($article, 'source.id');
+                $source_name = Arr::get($article, 'source.name');
+                if (empty($source_slug)) {
+                    $source_slug = Str::slug($source_name);
+                }
+
+                $sourceObject = Source::firstOrCreate(['source_slug' => $source_slug],
+                    ['source_slug' => $source_slug, 'source' => $source_name]);
+                /*******************    Author     ****************************/
+
+                $authorString = Arr::get($article, 'author');
+                $authors = AuthorRepository::createAuthorsByString($authorString);
+                $authorRaw = $authors->map(function ($author) {
+                    return $author->only(['id', 'name', 'slug']);
+                });
+
+
+
                 $newsData = [
                     'title' => $title,
                     'slug' => Str::slug($title),
@@ -60,8 +82,13 @@ class NewYorkFetchFeature extends BaseFeature
                     'image_url' => $thumbnail,
                     'published_at' => Carbon::parse($article['pub_date']),
                     'api_source' => 'NyTimes',
+                    'source_id' => $sourceObject->id,
+                    'raw_author' => json_encode($authorRaw)
                 ];
-                $data[] = NewsRepository::createNews($newsData);
+                $news = NewsRepository::createNews($newsData);
+
+                $data[] = $news;
+
             }
             $this->response = $data;
         } catch (\Exception $e) {
@@ -70,6 +97,9 @@ class NewYorkFetchFeature extends BaseFeature
         }
 
     }
+
+
+
 
     function _handle(Request $request)
     {

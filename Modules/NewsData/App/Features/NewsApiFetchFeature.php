@@ -6,7 +6,10 @@ use App\Features\BaseFeature;
 use App\Utils\HttpClient;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Modules\Article\App\Models\Source;
+use Modules\Article\App\Repositories\AuthorRepository;
 use Modules\Article\App\Repositories\NewsRepository;
 
 
@@ -20,6 +23,7 @@ class NewsApiFetchFeature extends BaseFeature
             $apiKey = $newsAPIConfig['api_key'];
             $baseUrl = $newsAPIConfig['api_url'];
             $newsAPIUrl = $baseUrl .'?country=us&pageSize=30&apiKey=' . $apiKey;
+
             $newsAPIHttp = HttpClient::get($newsAPIUrl);
 
             if (!$newsAPIHttp->ok()) {
@@ -34,6 +38,29 @@ class NewsApiFetchFeature extends BaseFeature
                 if ($newsByUrl) {
                     continue;
                 }
+
+                /*******************    Source     ****************************/
+                $source_slug = Arr::get($article, 'source.id');
+                $source_name = Arr::get($article, 'source.name');
+                if (empty($source_slug)) {
+                    $source_slug = Str::slug($source_name);
+                }
+
+                $sourceObject = Source::firstOrCreate(['slug' => $source_slug],
+                    ['slug' => $source_slug, 'name' => $source_name]);
+                /*******************    Author     ****************************/
+
+                $authorString = Arr::get($article, 'author');
+                $authors = AuthorRepository::createAuthorsByString($authorString);
+                $authorObj = null;
+                if(count($authors)){
+                    $authorObj = collect($authors)->map(function ($author) {
+                        return $author->only(['id', 'name', 'slug']);
+                    });
+                }
+
+
+
                 $newsData = [
                     'title' => $article['title'],
                     'slug' => Str::slug($article['title']),
@@ -42,12 +69,16 @@ class NewsApiFetchFeature extends BaseFeature
                     'image_url' => $article['urlToImage'],
                     'content' => $article['content'],
                     'published_at' => Carbon::parse($article['publishedAt']),
-                    'api_source' => 'NewsAPI',
+                    'source_id' => $sourceObject->id,
+                    'source_name' => $sourceObject->name,
+                    'authors_object' => json_encode($authorObj)
                 ];
-                $data[] = NewsRepository::createNews($newsData);
+                $news = NewsRepository::createNews($newsData, $authorObj);
+                $data[] = $news;
             }
             $this->response = $data;
         } catch (\Exception $e) {
+            dd($e);
             $this->statusCode = 500;
             $this->message = $e->getMessage();
         }

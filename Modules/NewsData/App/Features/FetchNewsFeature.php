@@ -12,8 +12,8 @@ class FetchNewsFeature extends BaseFeature
 {
     function _doAction()
     {
-        $apiOrg = app()->make(NewsApiFetchFeature::class)->_handle($this->request);
-        $newYork = app()->make(NewYorkFetchFeature::class)->_handle($this->request);
+        $newYork = $apiOrg = app()->make(NewsApiFetchFeature::class)->_handle($this->request);
+       //  $newYork =  app()->make(NewYorkFetchFeature::class)->_handle($this->request);
         if( ($apiOrg['statusCode'] == 200) && ($newYork['statusCode'] == 200) ) {
 
             $this->response['news-api-org'] = [
@@ -29,8 +29,6 @@ class FetchNewsFeature extends BaseFeature
             $this->message = 'Fetched news data failed';
         }
     }
-
-
 
     function _handleApi(Request $request)
     {

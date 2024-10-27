@@ -11,7 +11,15 @@ class News extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'title','slug','description','url','image_url','content', 'published_at', 'api_source'
+        'title','slug','description','url','image_url','content', 'published_at', 'api_source', 'source_id', 'source_name','authors_object'
     ];
+
+    public function author(){
+        return $this->belongsToMany(Author::class);
+    }
+
+    public function source(){
+        return $this->belongsTo(Source::class, 'source_id', 'id');
+    }
 
 }

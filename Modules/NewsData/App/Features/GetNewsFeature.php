@@ -13,7 +13,11 @@ class GetNewsFeature extends BaseFeature
 {
     function _doAction()
     {
-        $this->response = NewsRepository::getNewsBySearchFilter()->toArray();
+        $search = $this->request->get('search','');
+        $authors = $this->request->get('authors',[]);
+        $sources = $this->request->get('sources',[]);
+
+        $this->response = NewsRepository::getNewsBySearchFilter($search, $authors, $sources)->toArray();
     }
 
     function _handleApi(Request $request)
