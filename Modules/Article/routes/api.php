@@ -17,5 +17,5 @@ use Modules\Article\App\Http\Controllers\ArticleController;
 // ['auth:sanctum']
 Route::middleware([])->prefix('v1')->name('api.')->group(function () {
   //  Route::get('article', fn (Request $request) => $request->user())->name('article');
-    Route::get('article',[ArticleController::class,'index'] )->name('article');
+//     Route::get('article',[ArticleController::class,'index'] )->name('article');
 });

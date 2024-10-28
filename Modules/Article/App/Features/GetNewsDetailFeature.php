@@ -1,13 +1,11 @@
 <?php
 
-namespace Modules\NewsData\App\Features;
+namespace Modules\Article\App\Features;
 
 use App\Features\BaseFeature;
 use App\Http\Responses\AppResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Modules\Article\App\Repositories\NewsRepository;
-use Modules\User\App\Repositories\UserRepository;
 
 class GetNewsDetailFeature extends BaseFeature
 {
@@ -20,6 +18,7 @@ class GetNewsDetailFeature extends BaseFeature
         if( $news ) {
             $this->statusCode = 200;
             $this->response = $news->toArray();
+            $this->response['authors_object'] = json_decode($news['authors_object']);
         }else{
             $this->statusCode = 404;
             $this->message = 'No record found!';

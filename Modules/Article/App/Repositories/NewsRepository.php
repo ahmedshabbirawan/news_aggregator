@@ -1,6 +1,8 @@
 <?php
 
 namespace Modules\Article\App\Repositories;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Modules\Article\App\Models\News;
 
 class NewsRepository
@@ -10,7 +12,7 @@ class NewsRepository
     }
     public static function createNews($newsData, $authors = null){
         $news =  News::create($newsData);
-        if( count($authors) ){
+        if( is_array($authors) && count($authors) ){
             $authorIds = collect($authors)->pluck('id')->toArray();
             $news->author()->attach($authorIds);
         }
@@ -32,10 +34,33 @@ class NewsRepository
         self::applySearchFilters($articlesQuery, $search);
         self::applyAuthorFilters($articlesQuery, $authors);
         self::applySourceFilters($articlesQuery, $sources);
+        self::applyPreferredFilters($articlesQuery);
 
         return $articlesQuery->with('source')
             ->orderBy('published_at', 'desc')
             ->paginate(10, ['*'], 'page');
+    }
+
+
+    private static function applyPreferredFilters($query)
+    {
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->preference) {
+                $preference = json_decode($user->preference->meta_value, true);
+                $preferredAuthors = (array)Arr::get($preference, 'authors');
+                $preferredSources = (array)Arr::get($preference, 'sources');
+                if (count($preferredAuthors) || count($preferredSources)) {
+                    $query->where(function ($subQuery) use ($preferredAuthors, $preferredSources) {
+                        $subQuery->whereHas('author', function ($authorQuery) use ($preferredAuthors) {
+                            $authorQuery->whereIn('authors.id', $preferredAuthors);
+                        })->orWhereHas('source', function ($sourceQuery) use ($preferredSources) {
+                            $sourceQuery->whereIn('sources.id', $preferredSources);
+                        });
+                    });
+                }
+            }
+        }
     }
 
 

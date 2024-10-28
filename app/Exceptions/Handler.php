@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use App\Http\Responses\AppResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Throwable;
 use ReflectionException;
 
@@ -32,10 +33,13 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $exception)
     {
-        return parent::render($request, $exception);
         if ($exception instanceof ReflectionException) {
             $error = $exception->getMessage();
             return AppResponse::error($error);
+        }
+        if ($exception instanceof RouteNotFoundException) {
+            $error = $exception->getMessage();
+            return AppResponse::error('Login Required');
         }
         return parent::render($request, $exception);
     }

@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Modules\Article\App\Models\Source;
 use Modules\Article\App\Repositories\AuthorRepository;
 use Modules\Article\App\Repositories\NewsRepository;
+use Modules\Article\App\Repositories\SourceRepository;
 
 
 class NewsApiFetchFeature extends BaseFeature
@@ -46,7 +47,7 @@ class NewsApiFetchFeature extends BaseFeature
                     $source_slug = Str::slug($source_name);
                 }
 
-                $sourceObject = Source::firstOrCreate(['slug' => $source_slug],
+                $sourceObject = SourceRepository::firstOrCreate(['name' => $source_slug],
                     ['slug' => $source_slug, 'name' => $source_name]);
                 /*******************    Author     ****************************/
 

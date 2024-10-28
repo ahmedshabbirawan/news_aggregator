@@ -22,7 +22,7 @@ return new class extends Migration
             $table->text('content')->nullable()->fulltext();
             $table->integer('source_id')->nullable();
             $table->tinyText('source_name')->nullable();
-            $table->tinyText('authors_object')->nullable();
+            $table->text('authors_object')->nullable();
             $table->timestamp('published_at');
             $table->timestamps();
         });

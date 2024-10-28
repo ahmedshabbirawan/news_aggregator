@@ -12,9 +12,9 @@ class FetchNewsFeature extends BaseFeature
 {
     function _doAction()
     {
-        $newYork = $apiOrg = app()->make(NewsApiFetchFeature::class)->_handle($this->request);
-       //  $newYork =  app()->make(NewYorkFetchFeature::class)->_handle($this->request);
-        if( ($apiOrg['statusCode'] == 200) && ($newYork['statusCode'] == 200) ) {
+         $apiOrg = app()->make(NewsApiFetchFeature::class)->_handle($this->request);
+         $newYork =  app()->make(NewYorkFetchFeature::class)->_handle($this->request);
+         if( ($apiOrg['statusCode'] == 200) && ($newYork['statusCode'] == 200) ) {
 
             $this->response['news-api-org'] = [
                 'count' => count($apiOrg['response'])
